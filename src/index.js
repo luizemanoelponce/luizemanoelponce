@@ -11,7 +11,7 @@ import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
 ReactDOM.render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={process.env.PUBLIC_URL}>
       <Switch>
         <Route path="/" exact={true} component={Home} />
         <Route path="/tecnologias" component={Tecnologias} />
