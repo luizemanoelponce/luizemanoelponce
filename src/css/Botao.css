@@ -1,0 +1,10 @@
+.Botao{
+    text-decoration: none;
+    background-color: #23BE53;
+    padding: 0.5rem 1rem 0.5rem 1rem;
+    border-radius: 50px;
+}
+.Botao:hover{
+    background-color: white;
+    color: #23BE53;
+}

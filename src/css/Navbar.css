@@ -1,0 +1,73 @@
+nav{
+  height: 8vh;
+  background-color:#060608;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.branding{
+  display: block;
+  position: absolute;
+  top: 0.3rem;
+  left: 15px;
+  color: #E7DFDD;
+  font-size: 5vh;
+  font-weight: 600;
+}
+.branding span{
+  color: #23BE53;
+}
+.pages{
+  text-decoration: none;
+  color: #E7DFDD;
+  font-weight: 600;
+  margin: 0 15px 0 15px;
+}
+
+.button-menu{
+  display: none;
+  text-decoration: none;
+  border: none;
+  background-color: #060608;
+}
+.button-menu > span{
+  display: inline-block;
+  transform: rotate(90deg);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.1rem;
+}
+
+@media (max-width: 750px){
+  .pages{
+    display: none;
+  }
+  .button-menu{
+    display: block;
+    position: absolute;
+    top: 1rem;
+    right: 15px;
+  }
+  .navLinks{
+    height: 8.1vh;
+    width: 100%;
+    padding-top: 8vh;
+  }
+  .responsivo{
+    display: block;
+    position: relative;
+    width: 100%;
+    padding: 1rem;
+    margin: 0;
+    background-color: #060608;
+    text-decoration: none;
+    color: #E7DFDD;
+    font-weight: 600;
+    text-align: center;
+    z-index: 2;
+    
+
+  }
+
+}

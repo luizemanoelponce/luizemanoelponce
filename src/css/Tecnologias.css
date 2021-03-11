@@ -1,0 +1,25 @@
+*{
+    margin: 0;
+    color: #E7DFDD;
+}
+.tecnologias{
+    width: 100%;
+    background-color: #060608;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.tecnologias > section{
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+@media (max-width: 1000px){
+    .tecnologias > section{
+        width: 70%;
+    }
+}
