@@ -1,45 +1,173 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Links – Lista com copiar</title>
+  <style>
+    :root{
+      --bg: #f7f7f8;
+      --text: #0f172a;
+      --muted: #6b7280;
+      --item-bg: #f1f5f9;       /* cinza claro */
+      --item-border: #e5e7eb;   /* borda */
+      --btn: #111827;           /* botão */
+      --btn-hover: #0b1220;
+      --radius: 12px;
+      --shadow: 0 6px 18px rgba(0,0,0,.06);
+    }
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg: #0f172a;
+        --text: #e5e7eb;
+        --muted: #94a3b8;
+        --item-bg: #111827;
+        --item-border: #1f2937;
+        --btn: #e2e8f0;
+        --btn-hover: #ffffff;
+        --shadow: 0 10px 30px rgba(0,0,0,.35);
+      }
+    }
+    *{ box-sizing: border-box; }
+    body{
+      margin:0; padding:24px;
+      background: var(--bg); color: var(--text);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      display:flex; justify-content:center;
+    }
+    .wrap{ width:min(820px, 100%); }
+    h1{ margin: 0 0 10px 0; font-size: clamp(20px, 3vw, 28px); }
+    p{ margin: 0 0 18px 0; color: var(--muted); }
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>React App</title>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+    /* UL sem marcadores */
+    ul.links{
+      list-style: none;         /* remove marcadores */
+      margin:0; padding:0;
+      display:flex; flex-direction:column; gap:10px;
+    }
+    /* Cada item com fundo cinza, borda e cantos arredondados */
+    .links li{
+      background: var(--item-bg);
+      border: 1px solid var(--item-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 12px;
+      display:grid;
+      grid-template-columns: 1fr auto;
+      align-items:center;
+      gap: 10px;
+    }
+    /* URL com fonte monoespaçada e truncamento elegante */
+    .url{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      font-size: 13px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    /* Botão de copiar ao lado do texto */
+    .copy-btn{
+      appearance:none; border:1px solid rgba(0,0,0,.05);
+      background: linear-gradient(180deg, var(--btn), var(--btn-hover));
+      color: #ffffff;
+      padding: 8px 12px; border-radius: 10px; cursor:pointer;
+      font-weight: 600; font-size: 13px;
+      transition: transform .05s ease, filter .15s ease;
+    }
+    .copy-btn:hover{ transform: translateY(-1px); filter: brightness(1.05); }
+    .copy-btn:active{ transform: translateY(0); }
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+    /* Toast simples */
+    .toast{
+      position: fixed; right: 18px; bottom: 18px;
+      padding: 10px 12px; border-radius: 10px; color: #fff; font-weight: 700;
+      background: linear-gradient(180deg, #22c55e, #16a34a);
+      box-shadow: var(--shadow);
+      opacity: 0; transform: translateY(10px);
+      pointer-events: none; transition: all .25s ease;
+    }
+    .toast.show{ opacity:1; transform: translateY(0); }
+    /* Textarea escondida para fallback */
+    #hiddenTA{ position: fixed; left:-9999px; top:-9999px; opacity:0; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Links</h1>
+    <p>Clique no botão ao lado para copiar o link.</p>
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
-  </body>
+    <ul class="links" id="linksList">
+      <!-- Gerado via JS -->
+    </ul>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite">Copiado!</div>
+  <textarea id="hiddenTA" aria-hidden="true" tabindex="-1"></textarea>
+
+  <script>
+    // Lista de links (exatamente os que você forneceu)
+    const LINKS = [
+      "http://gpulse.redecorp.br:8080/pulse/plugins/pulse/#/",
+      "https://mesh.teltelecom.com.br:444/login?viewmode=11&gotonode=4deoNUvbP4Dwwt5Zmad1AjYLEPvELiFeeDyBmnwryJEZeQ49v$aani2oupxpdxnb",
+      "https://vivo.cvortex.com/crm/management",
+      "http://10.124.100.13:9091/"
+    ];
+
+    const $ = (s, r=document)=> r.querySelector(s);
+
+    function showToast(msg="Copiado!"){
+      const t = $("#toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(()=> t.classList.remove("show"), 1600);
+    }
+
+    async function copyWithFallback(text){
+      try{
+        if (navigator.clipboard && window.isSecureContext){
+          await navigator.clipboard.writeText(text);
+          showToast("Copiado para a área de transferência! 🎉");
+          return;
+        }
+        throw new Error("Clipboard API indisponível neste contexto.");
+      }catch(_){
+        try{
+          const ta = $("#hiddenTA");
+          ta.value = text;
+          ta.select();
+          ta.setSelectionRange(0, ta.value.length);
+          const ok = document.execCommand("copy");
+          if (!ok) throw new Error("execCommand falhou");
+          showToast("Copiado! ✅");
+        }catch(e2){
+          console.error(e2);
+          showToast("Não foi possível copiar automaticamente.");
+        }
+      }
+    }
+
+    function render(){
+      const ul = $("#linksList");
+      ul.innerHTML = "";
+      LINKS.forEach(url => {
+        const li = document.createElement("li");
+
+        const span = document.createElement("span");
+        span.className = "url";
+        span.title = url;
+        span.textContent = url;
+
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "copy-btn";
+        btn.textContent = "📋 Copiar";
+        btn.addEventListener("click", () => copyWithFallback(url));
+
+        li.append(span, btn);
+        ul.appendChild(li);
+      });
+    }
+
+    render();
+  </script>
+</body>
 </html>
